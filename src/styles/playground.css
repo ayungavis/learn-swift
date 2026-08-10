@@ -321,3 +321,53 @@
     scroll-behavior: auto !important;
   }
 }
+
+.font-playground .controls input[type='text'],
+.font-playground .controls textarea {
+  width: 100%;
+  border: 1px solid var(--playground-border);
+  border-radius: 8px;
+  background: var(--color-fd-background);
+  padding: 9px 10px;
+  color: var(--color-fd-foreground);
+  resize: vertical;
+}
+
+.font-playground .preview-stage {
+  align-items: center;
+  justify-content: center;
+}
+
+.font-playground .font-preview-card {
+  width: min(100%, 440px);
+  border: 1px solid var(--playground-border);
+  border-radius: 16px;
+  background: var(--color-fd-background);
+  padding: 28px;
+  box-shadow: 0 16px 44px rgb(15 23 42 / 10%);
+}
+
+.font-playground .font-preview-card > span,
+.font-playground .font-preview-card code,
+.font-playground .font-preview-note {
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.72rem;
+}
+
+.font-playground .font-preview-card p {
+  margin: 28px 0;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+.font-playground .font-preview-card code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.font-playground .font-preview-note {
+  margin: 0;
+  padding: 14px 18px;
+  border-top: 1px solid var(--playground-border);
+  background: color-mix(in srgb, #315bd6 8%, var(--color-fd-background));
+  line-height: 1.5;
+}

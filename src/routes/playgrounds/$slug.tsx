@@ -32,9 +32,9 @@ function PlaygroundPage(): React.JSX.Element {
           <Link
             className="text-sm font-semibold text-fd-primary underline underline-offset-4"
             to="/docs/$"
-            params={{ _splat: 'native-stacks' }}
+            params={{ _splat: playground.guideSlug }}
           >
-            Read the VStack/HStack guide
+            Read the guide
           </Link>
         </div>
         <Playground />

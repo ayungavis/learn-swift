@@ -1,4 +1,4 @@
 {
   "title": "SwiftUI Layout",
-  "pages": ["index", "native-stacks", "view-modifiers"]
+  "pages": ["index", "native-stacks", "view-modifiers", "custom-fonts"]
 }

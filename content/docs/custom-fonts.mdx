@@ -1,0 +1,85 @@
+---
+title: Custom fonts
+description: Register bundled font files once, use their PostScript names, and keep SwiftUI typography accessible with Dynamic Type.
+---
+
+Use the system font unless the product design requires a custom typeface. When it does, keep font setup at the app boundary and expose semantic SwiftUI tokens to feature views.
+
+## 1. Add the font files
+
+Drag each `.ttf` or `.otf` file into Xcode, enable **Copy items if needed**, and include the app under **Target Membership**.
+
+For iOS, watchOS, tvOS, and Mac Catalyst, register the filenames under `UIAppFonts` in `Info.plist`:
+
+```xml
+<key>UIAppFonts</key>
+<array>
+    <string>BrandSans-Regular.ttf</string>
+    <string>BrandSans-Semibold.ttf</string>
+</array>
+```
+
+`Info.plist` uses the bundled filenames, including their extensions. SwiftUI code uses each face's PostScript name, which you can inspect in Font Book under **Font Info**.
+
+## 2. Create semantic typography tokens
+
+Keep raw font names out of feature views. Name tokens after their UI purpose so a future typeface change stays in one place:
+
+```swift
+import SwiftUI
+
+enum AppTypography {
+    static let title: Font = .custom(
+        "BrandSans-Semibold",
+        size: 28,
+        relativeTo: .title2
+    )
+
+    static let body: Font = .custom(
+        "BrandSans-Regular",
+        size: 17,
+        relativeTo: .body
+    )
+
+    static let bodyEmphasis: Font = .custom(
+        "BrandSans-Semibold",
+        size: 17,
+        relativeTo: .body
+    )
+}
+```
+
+Then feature code stays native and readable:
+
+```swift
+VStack(alignment: .leading, spacing: 8) {
+    Text("Account")
+        .font(AppTypography.title)
+
+    Text("Manage your profile and security settings.")
+        .font(AppTypography.body)
+}
+```
+
+Use the PostScript name for the real regular, semibold, bold, or italic face. This makes the selected asset explicit instead of scattering raw font names and styling decisions through the app.
+
+## 3. Preserve Dynamic Type
+
+Prefer `Font.custom(_:size:relativeTo:)`. The `relativeTo` style tells SwiftUI how the font should follow the user's preferred content size.
+
+```swift
+Text("Readable at every size")
+    .font(.custom("BrandSans-Regular", size: 17, relativeTo: .body))
+```
+
+Avoid `Font.custom(_:fixedSize:)` for normal interface text because it does not respond to Dynamic Type. Reserve fixed sizing for exceptional decorative text that is not carrying essential information.
+
+## Verification checklist
+
+- Run the app and confirm the custom face appears; SwiftUI falls back to the system font when it cannot find the requested name.
+- Test at the largest accessibility text sizes and allow layouts to wrap vertically.
+- Include every required weight and italic face in the target.
+- Confirm the font license permits app distribution.
+- Keep user-facing strings localizable with `Text("...")`.
+
+[Build a typography token in the custom-font playground →](/playgrounds/custom-font)
