@@ -1,0 +1,99 @@
+---
+title: VStack and HStack
+description: Use native SwiftUI stacks with the same layout responsibilities as a React flex container.
+---
+
+## Direction
+
+The stack type is the direction. SwiftUI makes this compile-time structure instead of runtime configuration.
+
+```swift
+VStack {
+    Text("First")
+    Text("Second")
+}
+
+HStack {
+    Text("First")
+    Text("Second")
+}
+```
+
+Use `ZStack` when children overlap on the depth axis.
+
+## Alignment
+
+Alignment controls the cross axis:
+
+```swift
+VStack(alignment: .leading) {
+    Text("Title")
+    Text("Description")
+}
+
+HStack(alignment: .bottom) {
+    Text("Small")
+    Text("Large")
+        .font(.largeTitle)
+}
+```
+
+For a `VStack`, use `.leading`, `.center`, or `.trailing`. For an `HStack`, use `.top`, `.center`, `.firstTextBaseline`, `.lastTextBaseline`, or `.bottom`.
+
+## Spacing
+
+Spacing belongs in the stack initializer:
+
+```swift
+VStack(alignment: .leading, spacing: 12) {
+    Text("Title")
+    Text("Description")
+}
+
+HStack(alignment: .center, spacing: 8) {
+    Image(systemName: "bell")
+    Text("Notifications")
+}
+```
+
+## Justification
+
+SwiftUI does not have a stack-level `justifyContent` parameter. Use `Spacer()` when the stack has extra space:
+
+```swift
+HStack(spacing: 12) {
+    Text("Cancel")
+    Spacer()
+    Button("Save") {
+        save()
+    }
+}
+```
+
+Center or end-align the entire stack by giving it flexible space and choosing a frame alignment:
+
+```swift
+HStack(spacing: 12) {
+    Text("One")
+    Text("Two")
+}
+.frame(maxWidth: .infinity, alignment: .trailing)
+```
+
+For space-between, place a `Spacer()` between children. SwiftUI has no exact native space-around equivalent; prefer explicit spacing and padding.
+
+## Stretch
+
+SwiftUI has no stack-level stretch alignment. Give the child a flexible frame on the cross axis:
+
+```swift
+VStack(alignment: .leading, spacing: 12) {
+    Text("First")
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+    Text("Second")
+        .frame(maxWidth: .infinity, alignment: .leading)
+}
+```
+
+[Try these options in the Stack playground →](/playgrounds/stack-layout)

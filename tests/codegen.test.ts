@@ -1,0 +1,24 @@
+import { describe, expect, test } from "bun:test";
+
+import { buildNativeNotes, buildSwiftUICode, DEFAULT_CONFIG } from "../src/layout.ts";
+
+describe("SwiftUI code generator", (): void => {
+  test("maps native stack behavior and explains unsupported CSS semantics", (): void => {
+    const defaultCode = buildSwiftUICode(DEFAULT_CONFIG);
+    const spacedCode = buildSwiftUICode({
+      ...DEFAULT_CONFIG,
+      direction: "horizontal",
+      justify: "spaceBetween",
+    });
+    const notes = buildNativeNotes({
+      ...DEFAULT_CONFIG,
+      justify: "spaceAround",
+    });
+
+    expect(defaultCode).toContain("VStack(alignment: .leading, spacing: 12)");
+    expect(defaultCode).toContain(".frame(maxWidth: .infinity, alignment: .leading)");
+    expect(spacedCode).toContain("HStack(alignment: .top, spacing: 12)");
+    expect(spacedCode.match(/Spacer\(\)/g)).toHaveLength(2);
+    expect(notes.some((note: string): boolean => note.includes("no exact native space-around"))).toBeTrue();
+  });
+});

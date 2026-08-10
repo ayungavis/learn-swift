@@ -1,0 +1,87 @@
+---
+title: View modifiers
+description: Replace web-style Stack props with native SwiftUI modifier chains.
+---
+
+Modifiers apply to every SwiftUI `View`, including `VStack`, `HStack`, `ZStack`, `Text`, and your own views.
+
+## Padding
+
+```swift
+VStack(alignment: .leading, spacing: 12) {
+    Text("Title")
+    Text("Description")
+}
+.padding(.horizontal, 16)
+.padding(.vertical, 12)
+```
+
+Use `.padding(16)` when every edge has the same value.
+
+## Width
+
+Fit content is the default, so it usually needs no modifier.
+
+```swift
+// Fill available width
+VStack {
+    Text("Content")
+}
+.frame(maxWidth: .infinity, alignment: .leading)
+
+// Fixed width
+VStack {
+    Text("Content")
+}
+.frame(width: 320, alignment: .leading)
+```
+
+## Height
+
+```swift
+// Fill available height
+VStack {
+    Text("Content")
+}
+.frame(maxHeight: .infinity, alignment: .top)
+
+// Fixed height
+VStack {
+    Text("Content")
+}
+.frame(height: 240, alignment: .top)
+```
+
+## Modifier order
+
+Modifier order is part of the layout. Each modifier wraps the view returned before it.
+
+```swift
+// Padding is inside the background.
+Text("Save")
+    .padding(12)
+    .background(.blue)
+
+// Padding is outside the background.
+Text("Save")
+    .background(.blue)
+    .padding(12)
+```
+
+This is the native equivalent of your proposed fluent API:
+
+```swift
+VStack(alignment: .leading, spacing: 12) {
+    HStack(spacing: 8) {
+        Text("Test")
+    }
+
+    Text("Test 2")
+}
+.frame(maxWidth: .infinity, alignment: .leading)
+.frame(height: 240, alignment: .top)
+.padding(.horizontal, 16)
+.padding(.vertical, 12)
+```
+
+You do not need custom `.direction()`, `.align()`, `.justify()`, `.width()`, or `.height()` modifiers. Native initializers and `.frame` keep the code recognizable to every SwiftUI developer.
