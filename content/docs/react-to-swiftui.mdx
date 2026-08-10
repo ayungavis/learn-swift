@@ -1,0 +1,82 @@
+---
+title: React to SwiftUI
+description: Keep the useful declarative mental model while replacing DOM, CSS, hooks, and Context assumptions with native SwiftUI concepts.
+---
+
+React experience is useful because both frameworks describe UI from state. The important shift is that SwiftUI views are lightweight value descriptions, not persistent component instances or DOM nodes.
+
+The examples in this learning path target iOS 17 or later so they can use the Observation framework. Version-specific APIs are called out when they require a newer target.
+
+## Concept map
+
+| React | SwiftUI | Important difference |
+| --- | --- | --- |
+| Function component | `struct SomeView: View` | `body` returns a value describing UI |
+| JSX | `body: some View` | Swift's result builders provide the declarative syntax |
+| Read-only prop | `let` property | Prefer the smallest read-only contract |
+| `useState` | `@State private` | State belongs to the view that owns its lifetime |
+| Controlled prop and setter | `@Binding` | A binding is write access to storage owned elsewhere |
+| Observable store | `@Observable` model | SwiftUI tracks the properties read by a view |
+| Store passed to an editor | `@Bindable` | Use only when the receiving view needs bindings |
+| Context | `@Environment` | Reserve it for genuinely shared dependencies or values |
+| `.map()` | `ForEach` | Elements need stable identity that survives edits and reordering |
+| React Router | `NavigationStack` | Navigation is value-based state, not URL routing by default |
+| `useEffect` for async work | `.task` or `.task(id:)` | SwiftUI automatically cancels view-bound tasks |
+| Storybook story | `#Preview` | Previews compile the real SwiftUI view |
+| CSS class | View modifier or style | There is no global CSS cascade |
+
+## Similar syntax, different runtime
+
+React reconciles elements into a persistent DOM. SwiftUI repeatedly evaluates value-type view descriptions and reconciles them with platform-native UI. Keep `body` and view initializers cheap; move networking, persistence, decoding, and business rules to an appropriate dependency or model boundary.
+
+```swift
+import SwiftUI
+
+struct AccountHeader: View {
+    let name: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "person.crop.circle")
+                .accessibilityHidden(true)
+
+            Text(name)
+                .font(.headline)
+        }
+    }
+}
+```
+
+`name` behaves like a read-only prop. The view needs no custom state object, hook, or architecture layer to display it.
+
+## Do not translate hooks literally
+
+Choose the native API by responsibility:
+
+| Responsibility | SwiftUI tool |
+| --- | --- |
+| Preserve a local value across updates | `@State private` |
+| Let a child mutate parent-owned storage | `@Binding` |
+| React to a value changing | `.onChange(of:)` |
+| Start cancellable async work for a view | `.task` |
+| Restart async work when an input changes | `.task(id:)` |
+| Read a platform or app-wide value | `@Environment` |
+
+Avoid building a generic `useEffect` equivalent. Its responsibilities are deliberately split across SwiftUI APIs with different lifetimes.
+
+## Prefer native controls
+
+Use `Button`, `Toggle`, `Picker`, `TextField`, `List`, and `NavigationStack` before recreating their behavior. Native controls provide platform interaction, keyboard behavior, focus, and accessibility semantics that a gesture attached to a decorative view does not.
+
+## Recommended order
+
+1. [State and data flow](/docs/state-and-data-flow)
+2. [VStack and HStack](/docs/native-stacks)
+3. [View modifiers](/docs/view-modifiers)
+4. Lists and stable identity
+5. Navigation and presentations
+6. Async work and error states
+7. Previews, accessibility, and localization
+8. [Architecture that grows with the feature](/docs/architecture)
+
+[Choose a state relationship in the playground →](/playgrounds/state-ownership)

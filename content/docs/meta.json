@@ -1,4 +1,12 @@
 {
-  "title": "SwiftUI Layout",
-  "pages": ["index", "native-stacks", "view-modifiers", "custom-fonts"]
+  "title": "SwiftUI for React Developers",
+  "pages": [
+    "index",
+    "react-to-swiftui",
+    "state-and-data-flow",
+    "architecture",
+    "native-stacks",
+    "view-modifiers",
+    "custom-fonts"
+  ]
 }

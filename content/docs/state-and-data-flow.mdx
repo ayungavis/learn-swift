@@ -1,0 +1,136 @@
+---
+title: State and data flow
+description: Select SwiftUI state tools by ownership and write access instead of translating React hooks one for one.
+---
+
+Start with two questions:
+
+1. Who owns the value's lifetime?
+2. Does this view need to modify it?
+
+## Selection guide
+
+| Situation | Use |
+| --- | --- |
+| This view owns a simple value | `@State private` |
+| Parent passes a read-only value | `let` |
+| Child modifies parent-owned storage | `@Binding` |
+| This view owns an observable reference model | `@State private` with `@Observable` |
+| View receives an observable model and needs bindings | `@Bindable` |
+| Many descendants need a shared model or platform value | `@Environment` |
+
+## Local state
+
+Local state is the closest match to `useState`, but it must remain private because it is part of the view's implementation:
+
+```swift
+import SwiftUI
+
+struct NotificationToggle: View {
+    @State private var isEnabled = false
+
+    var body: some View {
+        Toggle("Notifications", isOn: $isEnabled)
+    }
+}
+```
+
+The `$` projection creates a `Binding<Bool>` for the native `Toggle`.
+
+## Read-only values and bindings
+
+Use `let` when a child only reads a value. Introduce `@Binding` only when the child must write back to the parent's storage:
+
+```swift
+import SwiftUI
+
+struct SettingsView: View {
+    @State private var isEnabled = false
+
+    var body: some View {
+        NotificationEditor(isEnabled: $isEnabled)
+    }
+}
+
+struct NotificationEditor: View {
+    @Binding var isEnabled: Bool
+
+    var body: some View {
+        Toggle("Notifications", isOn: $isEnabled)
+    }
+}
+```
+
+Do not mark a value passed from a parent as `@State`. SwiftUI preserves the initial state value and subsequent parent updates do not become the source of truth.
+
+## Observable models
+
+For iOS 17 and later, prefer the Observation framework for related screen state:
+
+```swift
+import Observation
+import SwiftUI
+
+@MainActor
+@Observable
+final class SettingsModel {
+    var displayName = "Taylor"
+    var notificationsEnabled = false
+}
+
+struct SettingsScreen: View {
+    @State private var model = SettingsModel()
+
+    var body: some View {
+        SettingsForm(model: model)
+    }
+}
+
+struct SettingsForm: View {
+    @Bindable var model: SettingsModel
+
+    var body: some View {
+        Form {
+            TextField("Display name", text: $model.displayName)
+            Toggle("Notifications", isOn: $model.notificationsEnabled)
+        }
+    }
+}
+```
+
+The owner stores the model with `@State`. The receiving editor uses `@Bindable` because it needs bindings to model properties. A receiving view that only reads the model can use `let model: SettingsModel`.
+
+## Environment is not a default
+
+Use the environment when a dependency is genuinely shared across a broad subtree:
+
+```swift
+@main
+struct ExampleApp: App {
+    @State private var settings = SettingsModel()
+
+    var body: some Scene {
+        WindowGroup {
+            SettingsScreen()
+                .environment(settings)
+        }
+    }
+}
+```
+
+Read it where needed with `@Environment(SettingsModel.self) private var settings`. Avoid putting feature-local values into the environment simply to avoid passing a parameter; hidden dependencies make previews and tests harder to configure.
+
+## Older deployment targets
+
+When the app must support iOS 16 or earlier, use `ObservableObject` with `@StateObject` for an owned model and `@ObservedObject` for an injected model. Keep that legacy path isolated instead of mixing both observation systems within one feature.
+
+## Correctness checklist
+
+- `@State` is private and created by the owning view.
+- Read-only inputs use `let`.
+- `@Binding` means the child can mutate storage owned elsewhere.
+- `@Observable` UI models are main-actor isolated unless the project uses main-actor default isolation.
+- Owned observable models use `@State`; injected editors use `@Bindable`.
+- Feature-local dependencies remain explicit instead of becoming global environment state.
+
+[Practice these choices in the State Ownership playground →](/playgrounds/state-ownership)

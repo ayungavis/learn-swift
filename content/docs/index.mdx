@@ -1,12 +1,16 @@
 ---
-title: SwiftUI Layout Lab
-description: Native SwiftUI layout documentation for developers coming from React and Flexbox.
+title: SwiftUI for React developers
+description: Learn native SwiftUI by connecting it to the React mental models you already understand.
 ---
 
-Use SwiftUI's native containers and modifiers directly. Your React mental model still helps, but the vocabulary moves to the container initializer and the view modifier chain.
+Bring your React experience, but learn SwiftUI on its own terms. The syntax is declarative in both frameworks; ownership, identity, layout, navigation, and platform behavior are different.
 
 ## Start here
 
+- [React to SwiftUI](/docs/react-to-swiftui) maps components, props, state, bindings, context, keys, effects, and previews.
+- [State and data flow](/docs/state-and-data-flow) teaches `let`, `@State`, `@Binding`, `@Observable`, `@Bindable`, and `@Environment` from ownership first.
+- [Architecture that grows with the feature](/docs/architecture) starts with native state and introduces lightweight MVVM only when dependencies or async effects justify it.
+- [Open the State Ownership playground](/playgrounds/state-ownership) to choose a relationship and generate the corresponding SwiftUI pattern.
 - [VStack and HStack](/docs/native-stacks) explains direction, alignment, justification, spacing, and `Spacer()`.
 - [View modifiers](/docs/view-modifiers) covers padding, width, height, and modifier order.
 - [Open the live Stack playground](/playgrounds/stack-layout) to generate native SwiftUI while you adjust the layout.
@@ -24,4 +28,4 @@ Use SwiftUI's native containers and modifiers directly. Your React mental model 
 | `gap` | stack `spacing:` |
 | `width: 100%` | `.frame(maxWidth: .infinity)` |
 
-The team-friendly default is simple: use `VStack`, `HStack`, and `ZStack` directly. Create a custom component when it represents a product concept, not when it only renames SwiftUI.
+The team-friendly default is simple: use native SwiftUI first. Create an abstraction when it owns a product concept, state transition, dependency boundary, or repeated style—not when it only renames an Apple API.

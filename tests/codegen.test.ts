@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import { buildNativeNotes, buildSwiftUICode, DEFAULT_CONFIG } from "../src/layout.ts";
 import { buildCustomFontCode } from "../src/playgrounds/custom-font.tsx";
+import { getStateExample } from "../src/playgrounds/state-ownership.tsx";
 
 describe("SwiftUI code generator", (): void => {
   test("maps native stack behavior and explains unsupported CSS semantics", (): void => {
@@ -38,5 +39,15 @@ describe("custom font code generator", (): void => {
     expect(code).toContain('"BrandSans-Semibold"');
     expect(code).toContain('relativeTo: .title2');
     expect(code).toContain('Text("Hello \\"SwiftUI\\"")');
+  });
+});
+
+describe("state ownership examples", (): void => {
+  test("maps ownership and write access to native SwiftUI contracts", (): void => {
+    expect(getStateExample("local").code).toContain("@State private");
+    expect(getStateExample("parent-read").contract).toBe("let");
+    expect(getStateExample("parent-write").code).toContain("@Binding");
+    expect(getStateExample("model-write").code).toContain("@Bindable");
+    expect(getStateExample("environment").code).toContain("@Environment(SettingsModel.self)");
   });
 });

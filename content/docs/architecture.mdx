@@ -1,0 +1,151 @@
+---
+title: Architecture that grows with the feature
+description: Start with native SwiftUI state, then introduce lightweight MVVM when screen-level effects and dependencies need a testable boundary.
+---
+
+## Fit result: MVVM
+
+**Fit.** MVVM is a sensible first architecture for a React-experienced SwiftUI team when a screen coordinates async work or external dependencies. It fits SwiftUI well, has a relatively low learning curve, and requires no framework dependency.
+
+MVVM is not the starting point for every view. A local toggle, reusable row, or presentational section should remain a plain `View` with `let`, `@State`, or `@Binding`.
+
+## Grow by pressure
+
+| Feature pressure | Smallest suitable boundary |
+| --- | --- |
+| Static or read-only presentation | Plain `View` with `let` inputs |
+| Local interaction | `@State private` in the owning view |
+| Child edits parent state | `@Binding` |
+| Related screen state | View-owned `@Observable` model |
+| Network, persistence, or analytics | Inject a protocol-backed dependency |
+| Multiple async states and intents | Lightweight MVVM |
+| Complex reusable navigation flow | Add a router or Coordinator for navigation only |
+
+Do not add a Use Case, Coordinator, repository, or dependency container until the feature has the responsibility that type would own.
+
+## Smallest useful MVVM slice
+
+```text
+Features/
+  Profile/
+    ProfileView.swift
+    ProfileViewModel.swift
+    ProfileRepository.swift
+```
+
+Split out additional state, view-data, assembly, or routing files only when those concepts become independently complex.
+
+## Boundaries
+
+- **View:** renders state and forwards user intent. It does not call services directly.
+- **ViewModel:** owns presentation state and coordinates effects on the main actor.
+- **Model:** contains UI-independent data and rules.
+- **Repository or service:** owns network, persistence, analytics, or another side effect.
+
+Dependency direction stays one way: `View → ViewModel → Repository`. The repository must not import SwiftUI.
+
+## Async and error handling
+
+The view-bound `.task` owns cancellation. The ViewModel exposes explicit states and receives its dependency through its initializer:
+
+```swift
+import Observation
+import SwiftUI
+
+struct Profile: Equatable, Sendable {
+    let name: String
+}
+
+protocol ProfileRepository: Sendable {
+    func fetchProfile() async throws -> Profile
+}
+
+@MainActor
+@Observable
+final class ProfileViewModel {
+    enum State: Equatable {
+        case idle
+        case loading
+        case loaded(Profile)
+        case failed(String)
+    }
+
+    private(set) var state: State = .idle
+    private let repository: any ProfileRepository
+
+    init(repository: any ProfileRepository) {
+        self.repository = repository
+    }
+
+    func load() async {
+        state = .loading
+
+        do {
+            let profile = try await repository.fetchProfile()
+            try Task.checkCancellation()
+            state = .loaded(profile)
+        } catch is CancellationError {
+            state = .idle
+        } catch {
+            state = .failed(error.localizedDescription)
+        }
+    }
+}
+
+struct ProfileView: View {
+    let viewModel: ProfileViewModel
+    @State private var reloadID = 0
+
+    var body: some View {
+        Group {
+            switch viewModel.state {
+            case .idle, .loading:
+                ProgressView()
+            case .loaded(let profile):
+                Text(profile.name)
+            case .failed(let message):
+                VStack(spacing: 12) {
+                    Text(message)
+                    Button("Retry") {
+                        reloadID += 1
+                    }
+                }
+            }
+        }
+        .task(id: reloadID) {
+            await viewModel.load()
+        }
+    }
+}
+```
+
+`ProfileView` receives the model as a read-only reference because it does not create bindings to its properties. The composition root owns and stores the ViewModel. The repository should preserve actionable error context—such as the request, status code, and response body—before the ViewModel maps the error to user-facing state.
+
+## Testing strategy
+
+Test the boundary with a small protocol fake or controlled repository:
+
+- `idle → loading → loaded` on success
+- `loading → failed` with an actionable error
+- cancellation does not let stale work overwrite newer state
+- domain values map to presentation values correctly
+
+Keep real integration or smoke coverage for the live repository. Do not mock SwiftUI itself.
+
+## When to choose something else
+
+- Choose MVI when strict state-machine transitions are a product requirement.
+- Choose TCA when the team accepts its dependency and needs reducer composition or `TestStore`.
+- Add Clean Architecture when replaceable infrastructure and strict domain boundaries span multiple modules.
+- Add Coordinator only when navigation flow, deep links, or mixed UIKit/SwiftUI ownership becomes a separate concern.
+
+## PR review checklist
+
+- The View renders state and does not call services directly.
+- View-owned state is private; injected values are not copied into `@State`.
+- The ViewModel is main-actor isolated and exposes explicit state.
+- Dependencies enter through initializers and side-effect protocols.
+- Async work has a cancellation path and stale results cannot overwrite current state.
+- Errors remain diagnosable at the repository boundary and become user-facing state deliberately.
+- Navigation uses value types; UIKit presentation APIs do not leak into the ViewModel.
+- Tests cover success, failure, cancellation, and important mappings.

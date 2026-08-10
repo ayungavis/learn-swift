@@ -6,6 +6,7 @@ describe('playground registry', (): void => {
   test('resolves registered playgrounds and rejects unknown slugs', (): void => {
     expect(getPlayground('stack-layout')?.title).toBe('VStack & HStack');
     expect(getPlayground('custom-font')?.guideSlug).toBe('custom-fonts');
+    expect(getPlayground('state-ownership')?.guideSlug).toBe('state-and-data-flow');
     expect(getPlayground('unknown')).toBeUndefined();
   });
 });

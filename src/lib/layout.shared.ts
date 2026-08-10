@@ -3,7 +3,7 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: 'SwiftUI Layout Lab',
+      title: 'Learn SwiftUI',
     },
     links: [
       {

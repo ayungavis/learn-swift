@@ -15,11 +15,11 @@ function Home(): React.JSX.Element {
         <section className="max-w-3xl">
           <p className="mb-4 text-sm font-semibold text-fd-primary">React mental model, native SwiftUI</p>
           <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">
-            Learn layout by changing it.
+            Learn SwiftUI by changing it.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-fd-muted-foreground">
-            Read the native API, adjust a live browser simulation, and copy the equivalent
-            VStack or HStack code into your SwiftUI project.
+            Connect React concepts to native SwiftUI, adjust a focused browser simulation,
+            and copy the equivalent code into your project.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link

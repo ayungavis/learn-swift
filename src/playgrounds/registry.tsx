@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 
 import { CustomFontPlayground } from './custom-font';
 import { StackLayoutPlayground } from './stack-layout';
+import { StateOwnershipPlayground } from './state-ownership';
 
 export interface PlaygroundDefinition {
   slug: string;
@@ -12,6 +13,13 @@ export interface PlaygroundDefinition {
 }
 
 export const PLAYGROUNDS: readonly PlaygroundDefinition[] = [
+  {
+    slug: 'state-ownership',
+    title: 'State ownership',
+    description: 'Choose who owns a value and generate the smallest correct SwiftUI state contract.',
+    guideSlug: 'state-and-data-flow',
+    component: StateOwnershipPlayground,
+  },
   {
     slug: 'stack-layout',
     title: 'VStack & HStack',

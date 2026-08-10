@@ -371,3 +371,103 @@
   background: color-mix(in srgb, #315bd6 8%, var(--color-fd-background));
   line-height: 1.5;
 }
+
+.state-playground .state-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+}
+
+.state-playground .state-detail-list div {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--playground-border);
+}
+
+.state-playground .state-detail-list dt {
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.state-playground .state-detail-list dd {
+  margin: 5px 0 0;
+  color: var(--color-fd-foreground);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.state-playground .state-detail-list code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.state-playground .preview-stage {
+  align-items: center;
+  justify-content: center;
+}
+
+.state-playground .state-preview {
+  width: min(100%, 520px);
+}
+
+.state-playground .state-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.state-playground .state-node {
+  display: flex;
+  min-height: 120px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--playground-border);
+  border-radius: 14px;
+  background: var(--color-fd-background);
+  padding: 18px;
+  text-align: center;
+}
+
+.state-playground .state-node span {
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.7rem;
+}
+
+.state-playground .state-node strong {
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+}
+
+.state-playground .state-node-accent {
+  border-color: color-mix(in srgb, var(--playground-accent) 58%, transparent);
+  background: color-mix(in srgb, var(--playground-accent) 9%, var(--color-fd-background));
+}
+
+.state-playground .state-arrow {
+  color: var(--playground-accent);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.state-playground .state-preview > p {
+  margin: 24px 0 0;
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .state-playground .state-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .state-playground .state-arrow {
+    transform: rotate(90deg);
+    text-align: center;
+  }
+}
